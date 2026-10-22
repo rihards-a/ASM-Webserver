@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>API keys</h1>
+{% if new_key %}
+<p class="flash">Copy the new key now; it is not shown again:<br><code>{{ new_key }}</code></p>
+{% endif %}
+<table>
+  <tr><th>Key</th><th>Description</th><th>Access</th><th>Created</th><th>Last used</th><th></th></tr>
+  {% for k in keys %}
+  <tr>
+    <td class="mono">asm_{{ k.key_prefix }}_...</td>
+    <td>{{ k.description or "" }}</td>
+    <td>{{ "read only" if k.read_only else "full" }}</td>
+    <td>{{ k.created_at }}</td>
+    <td>{{ k.last_used_at or "never" }}</td>
+    <td>{% if k.revoked_at %}revoked {{ k.revoked_at }}{% else %}
+      <form class="inline" method="post" action="{{ url_for('apikeys.revoke', key_id=k.api_key_id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button>Revoke</button>
+      </form>{% endif %}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="6">No keys yet.</td></tr>
+  {% endfor %}
+</table>
+
+<h2>New key</h2>
+<form method="post" action="{{ url_for('apikeys.create') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label for="prefix">Prefix (3 to 32 letters, digits or hyphens, e.g. n8n)</label>
+  <input id="prefix" name="prefix" required>
+  <label for="description">Description (optional)</label>
+  <input id="description" name="description">
+  {% if g.user.role == "operator" %}
+  <p><label><input type="checkbox" name="read_only"> Read only</label></p>
+  {% else %}
+  <p>Keys of viewer accounts are read only.</p>
+  {% endif %}
+  <p><button>Create key</button></p>
+</form>
+{% endblock %}

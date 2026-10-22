@@ -29,5 +29,9 @@ def create_app():
         SESSION_COOKIE_SAMESITE="Lax",
     )
     db.init_app(app)
+    
+    from . import apikeys, auth
+    app.register_blueprint(auth.bp)
+    app.register_blueprint(apikeys.bp)
 
     return app
