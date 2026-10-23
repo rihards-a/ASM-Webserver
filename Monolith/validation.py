@@ -77,7 +77,7 @@ def domain(value):
 def keyword(value):
     """Brand word in lower case: letters, digits and hyphens, no dots."""
     value = text(value, "Keyword", 63).lower()
-    if not re.fullmatch(r"[a-z0-9-]{1,63}", value):
+    if not re.fullmatch(r"[a-z0-9-]{2,63}", value):
         raise InputError("Keyword must be 2 to 63 letters, digits or hyphens.")
     return value
 
