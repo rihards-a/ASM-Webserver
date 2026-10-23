@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ target.label }}</h1>
+<table>
+  <tr><th>Kind</th><td>{{ target.kind }}</td></tr>
+  <tr><th>Value</th><td class="mono">{{ target.value }}</td></tr>
+  <tr><th>Enabled</th><td>{{ "yes" if target.enabled else "no" }}</td></tr>
+  {% if target.kind == "keyword" %}
+  <tr><th>Used by domains</th>
+    <td>{% for d in domains %}<a href="{{ url_for('targets.view', target_id=d.target_id) }}">{{ d.value }}</a> {% else %}none{% endfor %}</td></tr>
+  {% endif %}
+  <tr><th>Notes</th><td>{{ target.notes or "" }}</td></tr>
+  <tr><th>Created</th><td>{{ target.created_at }}</td></tr>
+  <tr><th>Updated</th><td>{{ target.updated_at }}</td></tr>
+</table>
+
+{% if g.user.role == "operator" %}
+<h2>Edit</h2>
+<form method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label for="label">Label</label>
+  <input id="label" name="label" value="{{ target.label }}" required>
+  <label for="notes">Notes</label>
+  <textarea id="notes" name="notes" rows="2">{{ target.notes or "" }}</textarea>
+  {% if target.kind == "domain" %}
+  <p>Keywords:
+    {% for k in keywords %}
+    <label><input type="checkbox" name="keyword_ids" value="{{ k.target_id }}"
+      {% if k.target_id in target.keyword_ids %}checked{% endif %}> {{ k.value }}</label>
+    {% else %}none registered{% endfor %}
+  </p>
+  {% endif %}
+  <p><label><input type="checkbox" name="enabled" {% if target.enabled %}checked{% endif %}> Enabled</label></p>
+  <p><button>Save</button></p>
+</form>
+
+<form method="post" action="{{ url_for('targets.delete', target_id=target.target_id) }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <p><button>Delete target and its history</button></p>
+</form>
+{% else %}
+{% if target.kind == "domain" %}
+<p>Keywords: {% for k in keywords if k.target_id in target.keyword_ids %}{{ k.value }} {% else %}none{% endfor %}</p>
+{% endif %}
+{% endif %}
+{% endblock %}

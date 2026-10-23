@@ -20,6 +20,7 @@
 <body>
 {% if g.user %}
 <nav>
+  <a href="{{ url_for('targets.search') }}">Targets</a>
   {% if g.user.role == "operator" %}
   <a href="{{ url_for('users.search') }}">Users</a>
   <a href="{{ url_for('users.audit_log') }}">Audit log</a>

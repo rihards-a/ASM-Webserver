@@ -30,9 +30,11 @@ def create_app():
     )
     db.init_app(app)
     
-    from . import auth, apikeys, users
+    from . import auth, apikeys, users, targets
     app.register_blueprint(auth.bp)
     app.register_blueprint(apikeys.bp)
     app.register_blueprint(users.bp)
+    app.register_blueprint(targets.bp)
+    app.register_blueprint(targets.api)
 
     return app

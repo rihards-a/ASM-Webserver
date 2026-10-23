@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Targets</h1>
+<table>
+  <tr><th>Label</th><th>Kind</th><th>Value</th><th>Enabled</th></tr>
+  {% for t in targets %}
+  <tr>
+    <td><a href="{{ url_for('targets.view', target_id=t.target_id) }}">{{ t.label }}</a></td>
+    <td>{{ t.kind }}</td>
+    <td class="mono">{{ t.value }}</td>
+    <td>{{ "yes" if t.enabled else "no" }}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="4">No targets yet.</td></tr>
+  {% endfor %}
+</table>
+
+{% if g.user.role == "operator" %}
+<h2>New target</h2>
+<form method="post" action="{{ url_for('targets.create') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label for="kind">Kind</label>
+  <select id="kind" name="kind">
+    {% for k in kinds %}<option>{{ k }}</option>{% endfor %}
+  </select>
+  <label for="value">Value: a domain (example.com), a keyword (example), or an IPv4
+    address, CIDR block or range (203.0.113.10-40)</label>
+  <input id="value" name="value" required>
+  <label for="label">Label</label>
+  <input id="label" name="label" required>
+  <label for="notes">Notes</label>
+  <textarea id="notes" name="notes" rows="2"></textarea>
+  {% if keywords %}
+  <p>Keywords (domains only):
+    {% for k in keywords %}
+    <label><input type="checkbox" name="keyword_ids" value="{{ k.target_id }}"> {{ k.value }}</label>
+    {% endfor %}
+  </p>
+  {% endif %}
+  <p><label><input type="checkbox" name="enabled" checked> Enabled</label></p>
+  <p><button>Create target</button></p>
+</form>
+{% endif %}
+{% endblock %}
