@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ user.username }}</h1>
+<form method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label for="role">Role</label>
+  <select id="role" name="role">
+    {% for r in roles %}<option {% if r == user.role %}selected{% endif %}>{{ r }}</option>{% endfor %}
+  </select>
+  <p><label><input type="checkbox" name="is_active" {% if user.is_active %}checked{% endif %}> Active</label></p>
+  <label for="password">New temporary password (optional; signs the user out)</label>
+  <input id="password" name="password" type="password">
+  <p><button>Save</button></p>
+</form>
+{% endblock %}

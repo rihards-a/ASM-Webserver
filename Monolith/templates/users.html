@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Users</h1>
+<table>
+  <tr><th>Username</th><th>Role</th><th>Active</th><th>Last sign-in</th><th>Created by</th></tr>
+  {% for u in users %}
+  <tr>
+    <td><a href="{{ url_for('users.edit', user_id=u.user_id) }}">{{ u.username }}</a></td>
+    <td>{{ u.role }}</td>
+    <td>{{ "yes" if u.is_active else "no" }}</td>
+    <td>{{ u.last_login_at or "never" }}</td>
+    <td>{{ u.created_by or "" }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+<h2>New user</h2>
+<form method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label for="username">Username</label>
+  <input id="username" name="username" required>
+  <label for="role">Role</label>
+  <select id="role" name="role">{% for r in roles %}<option>{{ r }}</option>{% endfor %}</select>
+  <label for="password">Temporary password (12 to 128 characters)</label>
+  <input id="password" name="password" type="password" required>
+  <p><button>Create user</button></p>
+</form>
+{% endblock %}

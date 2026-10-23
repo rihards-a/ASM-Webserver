@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Audit log</h1>
+<p>Latest 200 events, times in UTC.</p>
+<table>
+  <tr><th>Time</th><th>Actor</th><th>IP</th><th>Action</th><th>Outcome</th><th>Details</th></tr>
+  {% for e in events %}
+  <tr>
+    <td>{{ e.occurred_at }}</td>
+    <td>{% if e.actor_type == "api_key" %}{{ e.username }} (key asm_{{ e.key_prefix }}_){% elif e.username %}{{ e.username }}{% else %}{{ e.actor_type }}{% endif %}</td>
+    <td>{{ e.source_ip or "" }}</td>
+    <td>{{ e.action }}</td>
+    <td>{{ e.outcome }}</td>
+    <td class="mono">{{ e.details }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

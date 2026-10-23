@@ -20,6 +20,10 @@
 <body>
 {% if g.user %}
 <nav>
+  {% if g.user.role == "operator" %}
+  <a href="{{ url_for('users.search') }}">Users</a>
+  <a href="{{ url_for('users.audit_log') }}">Audit log</a>
+  {% endif %}
   <span class="right">
     <a href="{{ url_for('apikeys.search') }}">API keys</a>
     <a href="{{ url_for('auth.password') }}">Password</a>
