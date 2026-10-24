@@ -6,12 +6,15 @@ Data:  ./data/asma.db, created on first start together with the operator
 import os
 import secrets
 from datetime import timedelta
+from dotenv import load_dotenv
 from pathlib import Path
 
 from flask import Flask
 
 from . import db
 
+# Load environment variables from a .env file if it exists
+load_dotenv() 
 
 def create_app():
     app = Flask(__name__)
@@ -27,14 +30,21 @@ def create_app():
         PERMANENT_SESSION_LIFETIME=timedelta(minutes=30),
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
+        # API keys of the scanning services; a scanner without its key cannot be started.
+        OPENSQUAT_API_KEY=os.environ.get("ASMA_OPENSQUAT_API_KEY"),
+        HIBS_API_KEY=os.environ.get("ASMA_HIBS_API_KEY"),
+        SHODAN_API_KEY=os.environ.get("ASMA_SHODAN_API_KEY"),
     )
     db.init_app(app)
     
-    from . import auth, apikeys, users, targets
+    from . import auth, apikeys, users, targets, jobs
+    jobs.init_app(app)
     app.register_blueprint(auth.bp)
     app.register_blueprint(apikeys.bp)
     app.register_blueprint(users.bp)
     app.register_blueprint(targets.bp)
     app.register_blueprint(targets.api)
+    app.register_blueprint(jobs.bp)
+    app.register_blueprint(jobs.api)
 
     return app

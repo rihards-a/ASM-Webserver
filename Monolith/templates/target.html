@@ -13,6 +13,7 @@
   <tr><th>Created</th><td>{{ target.created_at }}</td></tr>
   <tr><th>Updated</th><td>{{ target.updated_at }}</td></tr>
 </table>
+<p><a href="{{ url_for('jobs.search', target_id=target.target_id) }}">Jobs of this target</a></p>
 
 {% if g.user.role == "operator" %}
 <h2>Edit</h2>

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Jobs</h1>
+<p>Newest 100 jobs{% if target_id %} of one target (<a href="{{ url_for('jobs.search') }}">all jobs</a>){% endif %}, times in UTC.</p>
+<table>
+  <tr><th>Job</th><th>Scanner</th><th>Target</th><th>Status</th><th>Queued</th><th>Finished</th><th>Findings</th></tr>
+  {% for j in jobs %}
+  <tr>
+    <td><a href="{{ url_for('jobs.view', job_id=j.job_id) }}">{{ j.job_id }}</a></td>
+    <td>{{ j.scanner }}</td>
+    <td class="mono">{{ j.target_value }}</td>
+    <td>{{ j.status }}</td>
+    <td>{{ j.queued_at }}</td>
+    <td>{{ j.finished_at or "" }}</td>
+    <td>{{ j.finding_count if j.finding_count is not none else "" }}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="7">No jobs yet.</td></tr>
+  {% endfor %}
+</table>
+
+{% if g.user.role == "operator" %}
+<h2>New job</h2>
+<form method="post" action="{{ url_for('jobs.create') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label for="target_id">Target (enabled targets only)</label>
+  <select id="target_id" name="target_id">
+    {% for t in targets %}<option value="{{ t.target_id }}" {% if t.target_id == target_id %}selected{% endif %}>{{ t.kind }}: {{ t.value }} ({{ t.label }})</option>{% endfor %}
+  </select>
+  <label for="scanner">Scanner</label>
+  <select id="scanner" name="scanner">
+    {% for name, s in scanners.items() %}<option value="{{ name }}">{{ name }} (scans {{ s.TARGET_KIND }} targets)</option>{% endfor %}
+  </select>
+  <p><button>Start job</button></p>
+</form>
+{% endif %}
+{% endblock %}
